@@ -17,7 +17,7 @@ const router = express.Router();
  * Make sure that the currently-logged-in users is either the to or from user.
  *
  **/
-router.get("/:id", async (req, res, next) => {
+router.get("/:id", ensureLoggedIn, async (req, res, next) => {
     try{
         const currUser = req.user.username;
         const id = req.params.id;
@@ -60,7 +60,7 @@ router.post("/", ensureLoggedIn, async (req, res, next) => {
  * Make sure that the only the intended recipient can mark as read.
  *
  **/
-router.post("/:id/read", async (req, res, next) => {
+router.post("/:id/read", ensureLoggedIn, async (req, res, next) => {
     try {
         const currUser = req.user.username;
         const id = req.params.id;
