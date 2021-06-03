@@ -4,7 +4,7 @@ const ExpressError = require("../expressError");
 const { BCRYPT_WORK_FACTOR } = require("../config");
 const bcrypt = require("bcrypt");
 const noResult = dbResult => dbResult ? dbResult.rowCount === 0 : false;
-const noSuchUserError = username => new ExpressError(`No such user: ${username}`, 404);
+const noSuchUserError = username => new ExpressError(`no such user: ${username}`, 404);
 
 /** User of the site. */
 
@@ -15,7 +15,6 @@ class User {
    */
 
   static async register({username, password, first_name, last_name, phone}) { 
-    try {
       const hashed = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
       const result = await db.query(
           `INSERT INTO 
@@ -25,14 +24,6 @@ class User {
           [username, hashed, first_name, last_name, phone]);
 
       return result.rows[0];
-    }
-    catch(e){
-      if(e.code === "p_key violation code"){
-        throw new ExpressError(`user already exists: ${username}`, 400);
-      }
-      else throw e;
-    }
-
   }
 
   /** Authenticate: is this username/password valid? Returns boolean. */
@@ -42,7 +33,7 @@ class User {
         SELECT password FROM users 
         WHERE username=$1`, 
         [username]);
-      if (noResult(result)) throw noSuchUserError(username);
+      if (noResult(result)) return false;
       else return bcrypt.compare(password, result.rows[0].password);
   }
 
